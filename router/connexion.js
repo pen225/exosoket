@@ -4,10 +4,9 @@ const router = express.Router();
 
 router.get('/', (req, res) =>{
     if (req.session.dataUser) {
-        res.render('index')
+        res.redirect('/');
     }else{
-        // res.send("Creez votre compte")
-        res.redirect('/connexion');
+        res.render('connexion')
     }
 })
 
@@ -19,11 +18,12 @@ router.post('/', (req, res) =>{
             res.render('connexion');
         }else{
             console.log("email exist");
-            const user = {
-                id: result[0].id
-            }
+            // const user = {
+            //     id: result[0].id
+            // }
+            const user = result[0].id
             req.session.dataUser = user;
-            // console.log(req.session);
+            console.log(req.session.dataUser);
             res.redirect('/')
         }
     })

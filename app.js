@@ -26,12 +26,18 @@ mysqlConnexion.connect((err) =>{
     console.log("Connexion à la base de données réussie");
     
 // initialisation de la session
-    app.use(session({
+    const sessionMiddleware =(session({
       secret: 'keyboard cat',
       resave: false,
       saveUninitialized: true,
       cookie: { maxAge: 60000202 }
     }))
+
+    app.use(sessionMiddleware);
+
+    io.use((socket, next) =>{
+      sessionMiddleware(socket.request, {}, next)
+    })
 
 
     app.use('/', index)
@@ -43,23 +49,25 @@ mysqlConnexion.connect((err) =>{
 
 
 io.on('connection', (socket) => {
+  console.log("socket.request.session", socket.request.session.dataUser);
     socket.on('chat message', (msg) => {
       console.log('message: ' + msg);
     });
 });
 
 io.emit('some event', { someProperty: 'some value', otherProperty: 'other value' });
-io.on('connection', (socket) => {
+io.on('connection', (socket) =>  {
     socket.on('chat message', (msg) => {
       io.emit('chat message', msg);
 
-      // mysqlConnexion.query('INSERT INTO messages (message) VALUES (?)', [msg], (err, result) =>{
-      //   if (err) {
-      //       console.log("Erreur d'enregistrement à la base de donnée", err);
-      //   }else{
-      //       console.log("Enregistrement fait avec succès", result);
-      //   }
-      // })
+      const userid = socket.request.session.dataUser;
+      mysqlConnexion.query('INSERT INTO messages (message, userid) VALUES (?, ?)', [msg, userid], (err, result) =>{
+        if (err) {
+            console.log("Erreur d'enregistrement à la base de donnée", err);
+        }else{
+            console.log("Enregistrement fait avec succès", result);
+        }
+      })
 
     });
 
