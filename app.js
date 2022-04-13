@@ -1,6 +1,6 @@
 const express = require('express');
 const app = express();
-const http = require('http');
+const http = require('http'); 
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 const mysqlConnexion = require('./database');
@@ -49,14 +49,14 @@ mysqlConnexion.connect((err) =>{
 
 
 io.on('connection', (socket) => {
-  console.log("socket.request.session", socket.request.session.dataUser);
+  // console.log("socket.request.session", socket.request.session.dataUser);
     socket.on('chat message', (msg) => {
       console.log('message: ' + msg);
     });
 });
 
 io.emit('some event', { someProperty: 'some value', otherProperty: 'other value' });
-io.on('connection', (socket) =>  {
+io.on('connection', (socket) =>  { 
     socket.on('chat message', (msg) => {
       io.emit('chat message', msg);
 
