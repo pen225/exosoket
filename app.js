@@ -18,6 +18,7 @@ app.set('view engine', 'ejs');
 
 app.use(express.json());
 app.use(express.urlencoded({extended:false}))
+app.use('/public', express.static('public'))
 
 mysqlConnexion.connect((err) =>{
   if (err) {
@@ -56,18 +57,22 @@ io.on('connection', (socket) => {
 });
 
 io.emit('some event', { someProperty: 'some value', otherProperty: 'other value' });
-io.on('connection', (socket) =>  { 
+io.on('connection', (socket) =>  {
+  const userid = socket.request.session.dataUser;
+  console.log("socket.request.session.dataUser",userid);
+  io.emit('userconnect', { data:userid})
     socket.on('chat message', (msg) => {
       io.emit('chat message', msg);
 
-      const userid = socket.request.session.dataUser;
-      mysqlConnexion.query('INSERT INTO messages (message, userid) VALUES (?, ?)', [msg, userid], (err, result) =>{
-        if (err) {
-            console.log("Erreur d'enregistrement à la base de donnée", err);
-        }else{
-            console.log("Enregistrement fait avec succès", result);
-        }
-      })
+      
+      
+      // mysqlConnexion.query('INSERT INTO messages (message, userid) VALUES (?, ?)', [msg, userid.id], (err, result) =>{
+      //   if (err) {
+      //       console.log("Erreur d'enregistrement à la base de donnée", err);
+      //   }else{
+      //       console.log("Enregistrement fait avec succès", result);
+      //   }
+      // })
 
     });
 

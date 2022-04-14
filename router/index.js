@@ -6,11 +6,10 @@ const mysqlConnexion = require('../database');
 router.get('/', (req, res) =>{
     const userid = req.session.dataUser;
     if (userid) {
-        res.render('index');
-        console.log("userid", userid);
-
-        mysqlConnexion.query("SELECT * from messages where userid = ?", [userid], (err, result) =>{
-            console.log("resultat de message", result);
+        mysqlConnexion.query("SELECT * from messages where userid = ?", [userid.id], (err, result) =>{
+            console.log("resultat de message");
+            console.log(result);
+            res.render('index', {data: result});
         })
 
     }else{
